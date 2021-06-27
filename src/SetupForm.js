@@ -1,14 +1,15 @@
 import React from "react";
 import { useGlobalContext } from "./context";
 
-const SetupFrom = (quiz) => {
+const SetupForm = () => {
   const { quiz, handleChange, handleSubmit } = useGlobalContext();
   return (
     <main>
       <section className="quiz quiz-section">
-        <form action="clarusway-quiz">
+        <form className="clarusway-quiz">
           <h2>Clarusway Quiz</h2>
-          <div className="from-control">
+
+          <div className="form-control">
             <label htmlFor="amount">Number of Questions</label>
             <input
               type="number"
@@ -21,35 +22,38 @@ const SetupFrom = (quiz) => {
               max={20}
             />
           </div>
+
           <div className="form-control">
             <label htmlFor="category">Category</label>
             <select
               name="category"
               id="category"
-              className="from-input"
+              className="form-input"
               value={quiz.category}
               onChange={handleChange}
             >
               <option value="sports">Sports</option>
-              <option value="mytgology">Mythology</option>
+              <option value="mythology">Mythology</option>
               <option value="entertainment">Entertainment</option>
             </select>
           </div>
-          <div className="from-control">
+
+          <div className="form-control">
             <label htmlFor="difficulty">Difficulty</label>
             <select
               name="difficulty"
               id="difficulty"
               className="form-input"
               value={quiz.difficulty}
-              onchange={handleChange}
+              onChange={handleChange}
             >
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
             </select>
           </div>
-          <button type="submit " onClick={handleSubmit} className="submit-btn">
+
+          <button type="submit" onClick={handleSubmit} className="submit-btn">
             Let's Go!
           </button>
         </form>
@@ -58,4 +62,4 @@ const SetupFrom = (quiz) => {
   );
 };
 
-export default SetupFrom;
+export default SetupForm;

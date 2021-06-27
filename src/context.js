@@ -4,54 +4,80 @@ import axios from "axios";
 const table = {
   sports: 21,
   mythology: 20,
-  entertainment: 32,
+  entertaiment: 32,
 };
 
-const API_ENDPOINT = "https://opentdb.com/api_config.php?";
+const API_ENDPOINT = "https://opentdb.com/api.php?";
 
-// const tempUrl = 'https://opentdb.com/api.php?amount=10&category=21&difficulty=easy&type=multiple
+//const tempUrl = 'https://opentdb.com/api.php?amount=10&category=21&difficulty=easy&type=multiple
 
 const AppContext = React.createContext();
 
 const AppProvider = ({ children }) => {
   const [waiting, setWaiting] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [question, setQuestion] = useState([]);
-  const [index, setİndex] = useState(0);
-  const [correct, setCorrect] = useState();
+  const [questions, setQuestions] = useState([]);
+  const [index, setIndex] = useState(0);
+  const [correct, setCorrect] = useState(0);
   const [error, setError] = useState(false);
   const [quiz, setQuiz] = useState({
     amount: 10,
     category: "sports",
     difficulty: "easy",
   });
-  const [isModalOpen, setİsModalOpen] = useState(false);
-};
 
-const fetchQuesions = async (url) => {
-  setLoading(true);
-  setWaiting(false);
-  const response = await axios(url).catch((err) => console.log(err));
-  if (response) {
-    const data = response.data.results;
-    if (data.length > 0) {
-      setQuestion(data);
-      setLoading(false);
-      setWaiting(false);
-      setError(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const fetchQuestions = async (url) => {
+    setLoading(true);
+    setWaiting(false);
+    const response = await axios(url).catch((err) => console.log(err));
+    if (response) {
+      const data = response.data.results;
+      if (data.length > 0) {
+        setQuestions(data);
+        setLoading(false);
+        setWaiting(false);
+        setError(false);
+      } else {
+        setWaiting(true);
+        setError(true);
+      }
     } else {
       setWaiting(true);
-      setError(true);
     }
-  } else {
-    setWaiting(true);
-  }
+  };
+
+  const nextQuestion = () => {
+    setIndex((oldIndex) => {
+      const index = oldIndex + 1;
+      if (index > questions.length - 1) {
+        openModal();
+        return 0;
+      } else {
+        return index;
+      }
+    });
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const checkAnswer = (value) => {
+    if (value) {
+      setCorrect((oldState) => oldState + 1);
+    }
+    nextQuestion();
+  };
 
   const closeModal = () => {
     setWaiting(true);
     setCorrect(0);
-    setİsModalOpen(false);
+    setIsModalOpen(false);
   };
+
+  //örnek: var dog = {legs:4, name:'doggie'} console.log(dog.name)
 
   const handleChange = (e) => {
     const name = e.target.name;
@@ -60,11 +86,11 @@ const fetchQuesions = async (url) => {
   };
 
   const handleSubmit = (e) => {
-    e.preventdefault();
+    e.preventDefault();
     const { amount, category, difficulty } = quiz;
 
-    const url = `${API_ENDPOINT} amount=${amount}&difficulty=${difficulty}&category=${table[category]}&type=multiple`;
-    fetchQuesions(url);
+    const url = `${API_ENDPOINT}amount=${amount}&difficulty=${difficulty}&category=${table[category]}&type=multiple`;
+    fetchQuestions(url);
   };
 
   return (
@@ -72,7 +98,7 @@ const fetchQuesions = async (url) => {
       value={{
         waiting,
         loading,
-        question,
+        questions,
         index,
         correct,
         error,
@@ -80,6 +106,9 @@ const fetchQuesions = async (url) => {
         quiz,
         handleChange,
         handleSubmit,
+        closeModal,
+        nextQuestion,
+        checkAnswer,
       }}
     >
       {children}
@@ -90,4 +119,5 @@ const fetchQuesions = async (url) => {
 export const useGlobalContext = () => {
   return useContext(AppContext);
 };
+
 export { AppContext, AppProvider };
